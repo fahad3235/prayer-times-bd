@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0b3d2e"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#d9a441" stroke-width="18"/>
+  <path d="M330 150a110 110 0 1 0 26 110 140 140 0 0 1-26-110z" fill="#d9a441"/>
+  <circle cx="345" cy="185" r="20" fill="#f0c96a"/>
+  <text x="256" y="452" text-anchor="middle" font-family="sans-serif" font-size="44" font-weight="bold" fill="#f0c96a">নামাজ</text>
+</svg>

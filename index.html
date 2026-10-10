@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d2e">
+<title>Namaz Times BD — Prayer Times for Bangladesh</title>
+<meta name="description" content="Accurate daily prayer times for 16 Bangladeshi cities, Qibla compass, monthly timetable, reminders. Works fully offline.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2"/><path d="M22 8a8 8 0 1 0 2 8 10 10 0 0 1-2-8z" fill="currentColor"/><circle cx="22.5" cy="11" r="1.6" fill="currentColor"/></svg>
+    <div>
+      <h1 data-i18n="appName">Namaz Times BD</h1>
+      <p class="tagline" data-i18n="tagline">Prayer times for Bangladesh</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button id="langToggle" class="pill-btn" aria-label="Switch language">বাং</button>
+    <button id="installBtn" class="pill-btn hidden" data-i18n="install">Install</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button class="tab active" data-tab="today" role="tab" aria-selected="true"><span class="tab-ico">🕌</span><span data-i18n="tabToday">Today</span></button>
+  <button class="tab" data-tab="month" role="tab" aria-selected="false"><span class="tab-ico">📅</span><span data-i18n="tabMonth">Month</span></button>
+  <button class="tab" data-tab="qibla" role="tab" aria-selected="false"><span class="tab-ico">🧭</span><span data-i18n="tabQibla">Qibla</span></button>
+  <button class="tab" data-tab="settings" role="tab" aria-selected="false"><span class="tab-ico">⚙️</span><span data-i18n="tabSettings">Settings</span></button>
+</nav>
+
+<main>
+  <!-- TODAY -->
+  <section id="tab-today" class="panel active" role="tabpanel">
+    <div class="location-row">
+      <select id="citySelect" aria-label="City"></select>
+      <button id="locateBtn" class="btn ghost" data-i18n="useGps">📍 Use GPS</button>
+    </div>
+    <p id="dateLine" class="date-line"></p>
+
+    <div class="hero card">
+      <div class="countdown-wrap">
+        <svg viewBox="0 0 120 120" class="ring">
+          <circle cx="60" cy="60" r="52" class="ring-bg"/>
+          <circle cx="60" cy="60" r="52" class="ring-fg" id="ringFg"/>
+          <text x="60" y="56" class="ring-next" id="ringNextName">—</text>
+          <text x="60" y="78" class="ring-time" id="ringCountdown">--:--:--</text>
+        </svg>
+      </div>
+      <div class="hero-info">
+        <p class="hero-label" data-i18n="nextPrayer">Next prayer</p>
+        <h2 id="nextPrayerName">—</h2>
+        <p class="hero-sub"><span id="currentPrayerLine">—</span></p>
+      </div>
+    </div>
+
+    <ul class="times-list card" id="timesList" aria-live="polite"></ul>
+
+    <div class="card info-card">
+      <p data-i18n="calcNote">Times are computed astronomically for your city. Verify with your local mosque for Jama'ah times.</p>
+    </div>
+  </section>
+
+  <!-- MONTH -->
+  <section id="tab-month" class="panel" role="tabpanel">
+    <div class="month-head">
+      <button id="monthPrev" class="btn ghost" aria-label="Previous month">‹</button>
+      <h2 id="monthTitle">—</h2>
+      <button id="monthNext" class="btn ghost" aria-label="Next month">›</button>
+    </div>
+    <div class="table-wrap card">
+      <table id="monthTable">
+        <thead><tr><th data-i18n="day">Day</th><th data-i18n="pFajr">Fajr</th><th data-i18n="pSunrise">Sunrise</th><th data-i18n="pDhuhr">Dhuhr</th><th data-i18n="pAsr">Asr</th><th data-i18n="pMaghrib">Maghrib</th><th data-i18n="pIsha">Isha</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="row-actions">
+      <button id="copyMonthBtn" class="btn" data-i18n="copy">📋 Copy</button>
+      <button id="printMonthBtn" class="btn ghost" data-i18n="print">🖨 Print</button>
+    </div>
+  </section>
+
+  <!-- QIBLA -->
+  <section id="tab-qibla" class="panel" role="tabpanel">
+    <div class="card qibla-card">
+      <div class="compass" id="compass">
+        <div class="compass-face">
+          <span class="dir n">N</span><span class="dir e">E</span><span class="dir s">S</span><span class="dir w">W</span>
+          <div class="qibla-arrow" id="qiblaArrow" title="Qibla">▲</div>
+          <div class="needle" id="needle"></div>
+          <div class="hub"></div>
+        </div>
+      </div>
+      <h2><span id="qiblaDeg">—</span>° <span data-i18n="fromNorth">from true north</span></h2>
+      <p class="muted" data-i18n="qiblaHint">Face the green arrow. On phones, enable "Use compass" to rotate with your device.</p>
+      <div class="row-actions">
+        <button id="compassBtn" class="btn" data-i18n="enableCompass">🧭 Use compass</button>
+      </div>
+      <p id="compassStatus" class="muted small"></p>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" class="panel" role="tabpanel">
+    <div class="card form-card">
+      <h2 data-i18n="calculation">Calculation</h2>
+      <label class="field"><span data-i18n="method">Method</span>
+        <select id="methodSelect"></select>
+      </label>
+      <label class="field"><span data-i18n="asrSchool">Asr juristic method</span>
+        <select id="asrSelect">
+          <option value="hanafi" data-i18n="hanafi">Hanafi (later Asr)</option>
+          <option value="shafii" data-i18n="shafii">Shafi'i / Maliki / Hanbali</option>
+        </select>
+      </label>
+      <label class="field"><span data-i18n="customCoords">Custom coordinates (overrides city)</span>
+        <span class="coords-row">
+          <input id="latInput" type="number" step="0.01" min="-90" max="90" placeholder="23.81" aria-label="Latitude">
+          <input id="lonInput" type="number" step="0.01" min="-180" max="180" placeholder="90.41" aria-label="Longitude">
+          <button id="clearCoordsBtn" class="btn ghost small" data-i18n="clear">Clear</button>
+        </span>
+        <small class="muted" data-i18n="coordsHint">Leave empty to use the selected city.</small>
+      </label>
+      <label class="field"><span data-i18n="clock">Clock</span>
+        <select id="clockSelect">
+          <option value="12" data-i18n="clock12">12-hour</option>
+          <option value="24" data-i18n="clock24">24-hour</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="card form-card">
+      <h2 data-i18n="reminders">Prayer reminders</h2>
+      <p class="muted small" data-i18n="reminderNote">Notifications appear while this page is open. Times are recomputed daily.</p>
+      <label class="switch-row"><span data-i18n="enableReminders">Enable reminders</span>
+        <button id="notifyToggle" class="switch" role="switch" aria-checked="false"><span class="knob"></span></button>
+      </label>
+      <div id="reminderList" class="reminder-list"></div>
+    </div>
+
+    <div class="card form-card">
+      <h2 data-i18n="about">About</h2>
+      <p class="muted small" data-i18n="aboutText">Namaz Times BD computes prayer times from real solar-position math — no internet needed after first load. v1.0.0.</p>
+      <p class="muted small">Hijri: <span id="hijriLine">—</span></p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p data-i18n="footerNote">Computed offline · Verify with your local mosque</p>
+</footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="js/prayer.js"></script>
+<script src="js/cities.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('js/sw.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>

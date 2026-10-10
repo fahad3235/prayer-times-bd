@@ -1,0 +1,1 @@
+{"description":"Namaz Times BD — offline prayer times for Bangladesh","license":"MIT","name":"prayer-times-bd","scripts":{"test":"node tests/prayer.test.js","test:smoke":"bash tests/smoke.sh"},"version":"1.0.0"}
